@@ -30,6 +30,14 @@ def token_required(function):
 
 
 def init_app(app):
+    @token_required
+    @app.get('/user')
+    def get_user():
+        with Session() as session:
+            query = select(User).where(User.token == request.form['token'])
+            user = session.scalars(query).first()
+            return jsonify(user.to_dict())
+
     @app.post('/user')
     def create_user():
         validation_response = validate_fields('name', 'email', 'password')
@@ -69,6 +77,17 @@ def init_app(app):
             user.photo = request.json['photo']
             user.update_at = datetime.now()
             user.cards = cards
+            return jsonify(user.to_dict())
+
+    @token_required
+    @app.delete('/user')
+    def delete_user():
+        with Session() as session:
+            query = select(User).where(User.token == request.form['token'])
+            user = session.scalars(query).first()
+            session.delete(user)
+            session.commit()
+            session.flush()
             return jsonify(user.to_dict())
 
     @token_required
@@ -117,11 +136,11 @@ def init_app(app):
     @token_required
     @app.put('/card')
     def update_card():
-        validation_response = validate_fields('card_id', 'status', 'title', 'description', 'category_id')
+        validation_response = validate_fields('id', 'status', 'title', 'description', 'category_id')
         if validation_response is not None:
             return validation_response
         with Session() as session:
-            card = session.get(Card, request.json['card_id'])
+            card = session.get(Card, request.json['id'])
             if request.json['status'] not in ['todo', 'doing', 'done']:
                 return (
                     jsonify(
@@ -142,6 +161,21 @@ def init_app(app):
                 return jsonify(card.to_dict())
             else:
                 return jsonify({'error': 'card not found'}), 404
+
+    @token_required
+    @app.delete('/card')
+    def delete_card():
+        with Session() as session:
+            validation_response = validate_fields('id')
+            if validation_response is not None:
+                return validation_response
+            card = session.get(Card, request.form['id'])
+            if card is None:
+                return jsonify({'error': 'card not found'}), 404
+            session.delete(card)
+            session.commit()
+            session.flush()
+            return jsonify(card.to_dict())
 
     @token_required
     @app.get('/card-category')
@@ -181,12 +215,12 @@ def init_app(app):
     @token_required
     @app.put('/card-category')
     def update_card_category():
-        validation_response = validate_fields('card_category_id', 'name')
+        validation_response = validate_fields('id', 'name')
         if validation_response is not None:
             return validation_response
         with Session() as session:
             card_category = session.get(
-                CardCategory, request.json['card_category_id']
+                CardCategory, request.json['id']
             )
             if card_category:
                 card_category.name = request.json['name']
@@ -196,3 +230,18 @@ def init_app(app):
                 return jsonify(card_category.to_dict())
             else:
                 return jsonify({'error': 'card category not found'}), 404
+
+    @token_required
+    @app.delete('/card-category')
+    def delete_card_category():
+        with Session() as session:
+            validation_response = validate_fields('id')
+            if validation_response is not None:
+                return validation_response
+            card_category = session.get(CardCategory, request.form['id'])
+            if card_category is None:
+                return jsonify({'error': 'card category not found'}), 404
+            session.delete(card_category)
+            session.commit()
+            session.flush()
+            return jsonify(card_category.to_dict())
