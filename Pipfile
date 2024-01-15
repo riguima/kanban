@@ -8,7 +8,6 @@ flask = "*"
 toml = "*"
 sqlalchemy = "*"
 gunicorn = "*"
-flask-login = "*"
 freezegun = "*"
 
 [dev-packages]

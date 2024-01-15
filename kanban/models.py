@@ -32,21 +32,6 @@ class User(Base):
         back_populates='user', cascade='all, delete-orphan'
     )
 
-    @property
-    def is_authenticated(self):
-        return False
-
-    @property
-    def is_active(self):
-        return False
-
-    @property
-    def is_anonymous(self):
-        return True
-
-    def get_id(self):
-        return str(self.id)
-
     def to_dict(self):
         return {
             'id': self.id,
