@@ -15,7 +15,7 @@ def validate_fields(*fields):
 
 
 def token_required(function):
-    def decorator(function):
+    def decorator():
         with Session() as session:
             if request.json.get('token') is None:
                 return jsonify({'error': 'required field "token"'}), 400
@@ -30,8 +30,8 @@ def token_required(function):
 
 
 def init_app(app):
-    @token_required
     @app.get('/user')
+    @token_required
     def get_user():
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -57,8 +57,8 @@ def init_app(app):
             session.flush()
             return jsonify(user.to_dict())
 
-    @token_required
     @app.put('/user')
+    @token_required
     def update_user():
         validation_response = validate_fields(
             'name', 'password', 'email', 'photo', 'cards_ids'
@@ -79,10 +79,12 @@ def init_app(app):
             user.photo = request.json['photo']
             user.update_at = datetime.now()
             user.cards = cards
+            session.commit()
+            session.flush()
             return jsonify(user.to_dict())
 
-    @token_required
     @app.delete('/user')
+    @token_required
     def delete_user():
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -92,8 +94,8 @@ def init_app(app):
             session.flush()
             return jsonify(user.to_dict())
 
-    @token_required
     @app.get('/card')
+    @token_required
     def get_cards():
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -102,8 +104,8 @@ def init_app(app):
             cards = [card.to_dict() for card in session.scalars(query).all()]
             return jsonify(cards)
 
-    @token_required
     @app.get('/card/<int:card_id>')
+    @token_required
     def get_card(card_id):
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -114,8 +116,8 @@ def init_app(app):
             else:
                 return jsonify({'error': 'card not found'}), 404
 
-    @token_required
     @app.post('/card')
+    @token_required
     def create_card():
         validation_response = validate_fields(
             'title', 'description', 'category_id'
@@ -140,8 +142,8 @@ def init_app(app):
             session.flush()
             return jsonify(card.to_dict())
 
-    @token_required
     @app.put('/card')
+    @token_required
     def update_card():
         validation_response = validate_fields(
             'id', 'status', 'title', 'description', 'category_id'
@@ -171,8 +173,8 @@ def init_app(app):
             else:
                 return jsonify({'error': 'card not found'}), 404
 
-    @token_required
     @app.delete('/card')
+    @token_required
     def delete_card():
         with Session() as session:
             validation_response = validate_fields('id')
@@ -186,8 +188,8 @@ def init_app(app):
             session.flush()
             return jsonify(card.to_dict())
 
-    @token_required
     @app.get('/card-category')
+    @token_required
     def get_cards_categories():
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -199,8 +201,8 @@ def init_app(app):
             ]
             return jsonify(cards_categories)
 
-    @token_required
     @app.get('/card-category/<int:card_category_id>')
+    @token_required
     def get_card_category(card_category_id):
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -211,8 +213,8 @@ def init_app(app):
             else:
                 return jsonify({'error': 'card category not found'}), 404
 
-    @token_required
     @app.post('/card-category')
+    @token_required
     def create_card_category():
         validation_response = validate_fields('name')
         if validation_response is not None:
@@ -228,8 +230,8 @@ def init_app(app):
             session.flush()
             return jsonify(card_category.to_dict())
 
-    @token_required
     @app.put('/card-category')
+    @token_required
     def update_card_category():
         validation_response = validate_fields('id', 'name')
         if validation_response is not None:
@@ -245,8 +247,8 @@ def init_app(app):
             else:
                 return jsonify({'error': 'card category not found'}), 404
 
-    @token_required
     @app.delete('/card-category')
+    @token_required
     def delete_card_category():
         with Session() as session:
             validation_response = validate_fields('id')
