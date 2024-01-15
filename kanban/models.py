@@ -25,7 +25,12 @@ class User(Base):
     update_at: Mapped[Optional[datetime]] = mapped_column(
         default=datetime.now()
     )
-    cards: Mapped[List['Card']] = relationship(back_populates='user')
+    cards: Mapped[List['Card']] = relationship(
+        back_populates='user', cascade='all, delete-orphan'
+    )
+    cards_categories: Mapped[List['CardCategory']] = relationship(
+        back_populates='user', cascade='all, delete-orphan'
+    )
 
     @property
     def is_authenticated(self):
@@ -96,7 +101,11 @@ class CardCategory(Base):
     update_at: Mapped[Optional[datetime]] = mapped_column(
         default=datetime.now()
     )
-    card: Mapped['Card'] = relationship(back_populates='category')
+    card: Mapped['Card'] = relationship(
+        back_populates='category', cascade='all, delete-orphan'
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user: Mapped['User'] = relationship(back_populates='cards_categories')
 
     def to_dict(self):
         return {

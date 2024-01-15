@@ -34,7 +34,7 @@ def init_app(app):
     @app.get('/user')
     def get_user():
         with Session() as session:
-            query = select(User).where(User.token == request.form['token'])
+            query = select(User).where(User.token == request.json['token'])
             user = session.scalars(query).first()
             return jsonify(user.to_dict())
 
@@ -60,7 +60,9 @@ def init_app(app):
     @token_required
     @app.put('/user')
     def update_user():
-        validation_response = validate_fields('name', 'password', 'email', 'photo', 'cards_ids')
+        validation_response = validate_fields(
+            'name', 'password', 'email', 'photo', 'cards_ids'
+        )
         if validation_response is not None:
             return validation_response
         with Session() as session:
@@ -83,7 +85,7 @@ def init_app(app):
     @app.delete('/user')
     def delete_user():
         with Session() as session:
-            query = select(User).where(User.token == request.form['token'])
+            query = select(User).where(User.token == request.json['token'])
             user = session.scalars(query).first()
             session.delete(user)
             session.commit()
@@ -94,17 +96,20 @@ def init_app(app):
     @app.get('/card')
     def get_cards():
         with Session() as session:
-            cards = [
-                card.to_dict() for card in session.scalars(select(Card)).all()
-            ]
+            query = select(User).where(User.token == request.json['token'])
+            user = session.scalars(query).first()
+            query = select(Card).where(Card.user_id == user.id)
+            cards = [card.to_dict() for card in session.scalars(query).all()]
             return jsonify(cards)
 
     @token_required
     @app.get('/card/<int:card_id>')
     def get_card(card_id):
         with Session() as session:
+            query = select(User).where(User.token == request.json['token'])
+            user = session.scalars(query).first()
             card = session.get(Card, card_id)
-            if card:
+            if card and card.user_id == user.id:
                 return jsonify(card.to_dict())
             else:
                 return jsonify({'error': 'card not found'}), 404
@@ -112,7 +117,9 @@ def init_app(app):
     @token_required
     @app.post('/card')
     def create_card():
-        validation_response = validate_fields('title', 'description', 'category_id')
+        validation_response = validate_fields(
+            'title', 'description', 'category_id'
+        )
         if validation_response is not None:
             return validation_response
         with Session() as session:
@@ -136,7 +143,9 @@ def init_app(app):
     @token_required
     @app.put('/card')
     def update_card():
-        validation_response = validate_fields('id', 'status', 'title', 'description', 'category_id')
+        validation_response = validate_fields(
+            'id', 'status', 'title', 'description', 'category_id'
+        )
         if validation_response is not None:
             return validation_response
         with Session() as session:
@@ -169,7 +178,7 @@ def init_app(app):
             validation_response = validate_fields('id')
             if validation_response is not None:
                 return validation_response
-            card = session.get(Card, request.form['id'])
+            card = session.get(Card, request.json['id'])
             if card is None:
                 return jsonify({'error': 'card not found'}), 404
             session.delete(card)
@@ -181,11 +190,12 @@ def init_app(app):
     @app.get('/card-category')
     def get_cards_categories():
         with Session() as session:
+            query = select(User).where(User.token == request.json['token'])
+            user = session.scalars(query).first()
+            query = select(CardCategory).where(CardCategory.user_id == user.id)
             cards_categories = [
                 card_category.to_dict()
-                for card_category in session.scalars(
-                    select(CardCategory)
-                ).all()
+                for card_category in session.scalars(query).all()
             ]
             return jsonify(cards_categories)
 
@@ -193,8 +203,10 @@ def init_app(app):
     @app.get('/card-category/<int:card_category_id>')
     def get_card_category(card_category_id):
         with Session() as session:
+            query = select(User).where(User.token == request.json['token'])
+            user = session.scalars(query).first()
             card_category = session.get(CardCategory, card_category_id)
-            if card_category:
+            if card_category and card_category.user_id == user.id:
                 return jsonify(card_category.to_dict())
             else:
                 return jsonify({'error': 'card category not found'}), 404
@@ -206,7 +218,11 @@ def init_app(app):
         if validation_response is not None:
             return validation_response
         with Session() as session:
-            card_category = CardCategory(name=request.json['name'])
+            query = select(User).where(User.token == request.json['token'])
+            user = session.scalars(query).first()
+            card_category = CardCategory(
+                name=request.json['name'], user_id=user.id
+            )
             session.add(card_category)
             session.commit()
             session.flush()
@@ -219,9 +235,7 @@ def init_app(app):
         if validation_response is not None:
             return validation_response
         with Session() as session:
-            card_category = session.get(
-                CardCategory, request.json['id']
-            )
+            card_category = session.get(CardCategory, request.json['id'])
             if card_category:
                 card_category.name = request.json['name']
                 card_category.update_at = datetime.now()
@@ -238,7 +252,7 @@ def init_app(app):
             validation_response = validate_fields('id')
             if validation_response is not None:
                 return validation_response
-            card_category = session.get(CardCategory, request.form['id'])
+            card_category = session.get(CardCategory, request.json['id'])
             if card_category is None:
                 return jsonify({'error': 'card category not found'}), 404
             session.delete(card_category)
