@@ -42,6 +42,19 @@ class User(Base):
     def get_id(self):
         return str(self.id)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'password': self.password,
+            'email': self.email,
+            'token': self.token,
+            'photo': self.photo,
+            'create_at': self.create_at,
+            'update_at': self.update_at,
+            'cards': [card.to_dict() for card in self.cards],
+        }
+
 
 class Card(Base):
     __tablename__ = 'cards'
@@ -60,6 +73,18 @@ class Card(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey('cards_categories.id'))
     category: Mapped['CardCategory'] = relationship(back_populates='card')
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'status': self.status,
+            'title': self.title,
+            'description': self.description,
+            'create_at': self.create_at,
+            'update_at': self.update_at,
+            'user_id': self.user_id,
+            'category_id': self.category_id,
+        }
+
 
 class CardCategory(Base):
     __tablename__ = 'cards_categories'
@@ -72,6 +97,15 @@ class CardCategory(Base):
         default=datetime.now()
     )
     card: Mapped['Card'] = relationship(back_populates='category')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'create_at': self.create_at,
+            'update_at': self.update_at,
+            'card_id': self.card.id,
+        }
 
 
 Base.metadata.create_all(db)

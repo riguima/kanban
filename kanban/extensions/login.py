@@ -1,5 +1,4 @@
 from flask_login import LoginManager
-from sqlalchemy import select
 
 from kanban.database import Session
 from kanban.models import User
