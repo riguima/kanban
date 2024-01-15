@@ -24,8 +24,6 @@ def required_fields(*fields):
 
 
 def token_required(function):
-    print(function)
-
     @wraps(function)
     def decorator(*args, **kwargs):
         with Session() as session:
