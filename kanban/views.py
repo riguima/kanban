@@ -3,20 +3,15 @@ from uuid import uuid4
 
 from flask import jsonify, request
 from sqlalchemy import select
-from werkzeug.security import generate_password_hash
 
 from kanban.database import Session
 from kanban.models import Card, CardCategory, User
 
 
-def required_fields(*args):
-    def decorator(function):
-        for arg in args:
-            if request.json.get(arg) is None:
-                return jsonify({'error': f'required field "{arg}"'}), 400
-        return function()
-
-    return decorator
+def validate_fields(*fields):
+    for field in fields:
+        if request.json.get(field) is None:
+            return jsonify({'error': f'required field "{field}"'}), 400
 
 
 def token_required(function):
@@ -35,15 +30,17 @@ def token_required(function):
 
 
 def init_app(app):
-    @required_fields('name', 'email', 'password')
     @app.post('/user')
     def create_user():
+        validation_response = validate_fields('name', 'email', 'password')
+        if validation_response is not None:
+            return validation_response
         with Session() as session:
-            token = uuid4()
+            token = str(uuid4())
             user = User(
                 name=request.json['name'],
                 email=request.json['email'],
-                password=generate_password_hash(request.json['password']),
+                password=request.json['password'],
                 token=token,
                 photo=request.json.get('photo'),
             )
@@ -52,10 +49,12 @@ def init_app(app):
             session.flush()
             return jsonify(user.to_dict())
 
-    @required_fields('name', 'password', 'email', 'photo', 'cards_ids')
     @token_required
     @app.put('/user')
     def update_user():
+        validation_response = validate_fields('name', 'password', 'email', 'photo', 'cards_ids')
+        if validation_response is not None:
+            return validation_response
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
             user = session.scalars(query).first()
@@ -91,10 +90,12 @@ def init_app(app):
             else:
                 return jsonify({'error': 'card not found'}), 404
 
-    @required_fields('title', 'description', 'category_id')
     @token_required
     @app.post('/card')
     def create_card():
+        validation_response = validate_fields('title', 'description', 'category_id')
+        if validation_response is not None:
+            return validation_response
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
             user = session.scalars(query).first()
@@ -113,10 +114,12 @@ def init_app(app):
             session.flush()
             return jsonify(card.to_dict())
 
-    @required_fields('status')
     @token_required
     @app.put('/card')
     def update_card():
+        validation_response = validate_fields('card_id', 'status', 'title', 'description', 'category_id')
+        if validation_response is not None:
+            return validation_response
         with Session() as session:
             card = session.get(Card, request.json['card_id'])
             if request.json['status'] not in ['todo', 'doing', 'done']:
@@ -162,10 +165,12 @@ def init_app(app):
             else:
                 return jsonify({'error': 'card category not found'}), 404
 
-    @required_fields('name')
     @token_required
     @app.post('/card-category')
     def create_card_category():
+        validation_response = validate_fields('name')
+        if validation_response is not None:
+            return validation_response
         with Session() as session:
             card_category = CardCategory(name=request.json['name'])
             session.add(card_category)
@@ -173,10 +178,12 @@ def init_app(app):
             session.flush()
             return jsonify(card_category.to_dict())
 
-    @required_fields('card_category_id', 'name')
     @token_required
     @app.put('/card-category')
     def update_card_category():
+        validation_response = validate_fields('card_category_id', 'name')
+        if validation_response is not None:
+            return validation_response
         with Session() as session:
             card_category = session.get(
                 CardCategory, request.json['card_category_id']
