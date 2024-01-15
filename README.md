@@ -24,7 +24,7 @@ sudo docker run --name kanban -p 8000:8000 -d kanban
 Todos os campos devem ser passados em formato `JSON`, segue os endpoints:
 
 - `/user`
-    - `POST` = Campos: `token`, `name`, `email`, `password`, `photo` (Opcional).
+    - `POST` = Campos: `name`, `email`, `password`, `photo` (Opcional).
     - `GET` = Campos: `token`.
     - `PUT` = Campos: `token`, `name`, `email`, `password`, `photo`, `cards_ids`.
     - `DELETE` = Campos: `token`.
