@@ -66,7 +66,7 @@ def init_app(app):
 
     @app.put('/user')
     @token_required
-    @required_fields('name', 'password', 'email', 'photo', 'cards_ids')
+    @required_fields('name', 'password', 'email', 'cards_ids')
     def update_user():
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -79,7 +79,7 @@ def init_app(app):
             user.name = request.json['name']
             user.password = request.json['password']
             user.email = request.json['email']
-            user.photo = request.json['photo']
+            user.photo = request.json.get('photo')
             user.update_at = datetime.now()
             user.cards = cards
             session.commit()
@@ -121,7 +121,7 @@ def init_app(app):
 
     @app.post('/card')
     @token_required
-    @required_fields('title', 'description', 'category_id')
+    @required_fields('title', 'category_id')
     def create_card():
         with Session() as session:
             query = select(User).where(User.token == request.json['token'])
@@ -132,7 +132,7 @@ def init_app(app):
             card = Card(
                 status='todo',
                 title=request.json['title'],
-                description=request.json['description'],
+                description=request.json.get('description'),
                 category_id=category.id,
                 user_id=user.id,
             )
@@ -143,7 +143,7 @@ def init_app(app):
 
     @app.put('/card')
     @token_required
-    @required_fields('id', 'status', 'title', 'description', 'category_id')
+    @required_fields('id', 'status', 'title', 'category_id')
     def update_card():
         with Session() as session:
             card = session.get(Card, request.json['id'])
@@ -159,7 +159,7 @@ def init_app(app):
             if card:
                 card.status = request.json['status']
                 card.title = request.json['title']
-                card.description = request.json['description']
+                card.description = request.json.get('description')
                 card.update_at = datetime.now()
                 card.category_id = request.json['category_id']
                 session.commit()

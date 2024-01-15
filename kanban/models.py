@@ -66,7 +66,7 @@ class Card(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     status: Mapped[str]
     title: Mapped[str]
-    description: Mapped[str]
+    description: Mapped[Optional[str]]
     create_at: Mapped[Optional[datetime]] = mapped_column(
         default=datetime.now()
     )
@@ -108,12 +108,16 @@ class CardCategory(Base):
     user: Mapped['User'] = relationship(back_populates='cards_categories')
 
     def to_dict(self):
+        if self.card:
+            card_id = self.card.id
+        else:
+            card_id = None
         return {
             'id': self.id,
             'name': self.name,
             'create_at': self.create_at,
             'update_at': self.update_at,
-            'card_id': self.card.id,
+            'card_id': card_id,
         }
 
 
