@@ -26,12 +26,12 @@ Todos os campos devem ser passados em formato `JSON`, segue os endpoints:
 - `/user`
     - `POST` = Campos: `name`, `email`, `password`, `photo` (Opcional).
     - `GET` = Campos: `token`.
-    - `PUT` = Campos: `token`, `name`, `email`, `password`, `photo`, `cards_ids`.
+    - `PUT` = Campos: `token`, `name`, `email`, `password`, `photo` (Opcional), `cards_ids`.
     - `DELETE` = Campos: `token`.
 - `/card`
-    - `POST` = Campos: `token`, `title`, `description`, `category_id`.
+    - `POST` = Campos: `token`, `title`, `description` (Opcional), `category_id`.
     - `GET` = Campos: `token`.
-    - `PUT` = Campos: `token`, `id`, `status`, `title`, `description`, `category_id`.
+    - `PUT` = Campos: `token`, `id`, `status`, `title`, `description` (Opcional), `category_id`.
     - `DELETE` = Campos: `token`, `id`.
 - `/card/<card_id>`
     - `GET` = Campos: `token`.
