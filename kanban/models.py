@@ -1,8 +1,8 @@
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from kanban.database import db
 
@@ -17,9 +17,14 @@ class User(Base):
     name: Mapped[str]
     password: Mapped[str]
     email: Mapped[str]
-    photo: Mapped[str]
-    create_at: Mapped[Optional[datetime]] = mapped_column(default=datetime.now())
-    update_at: Mapped[Optional[datetime]] = mapped_column(default=datetime.now())
+    token: Mapped[str]
+    photo: Mapped[Optional[str]]
+    create_at: Mapped[Optional[datetime]] = mapped_column(
+        default=datetime.now()
+    )
+    update_at: Mapped[Optional[datetime]] = mapped_column(
+        default=datetime.now()
+    )
     cards: Mapped[List['Card']] = relationship(back_populates='user')
 
     @property
@@ -44,10 +49,15 @@ class Card(Base):
     status: Mapped[str]
     title: Mapped[str]
     description: Mapped[str]
-    create_at: Mapped[Optional[datetime]] = mapped_column(default=datetime.now())
-    update_at: Mapped[Optional[datetime]] = mapped_column(default=datetime.now())
+    create_at: Mapped[Optional[datetime]] = mapped_column(
+        default=datetime.now()
+    )
+    update_at: Mapped[Optional[datetime]] = mapped_column(
+        default=datetime.now()
+    )
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     user: Mapped['User'] = relationship(back_populates='cards')
+    category_id: Mapped[int] = mapped_column(ForeignKey('cards_categories.id'))
     category: Mapped['CardCategory'] = relationship(back_populates='card')
 
 
@@ -55,9 +65,12 @@ class CardCategory(Base):
     __tablename__ = 'cards_categories'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    create_at: Mapped[Optional[datetime]] = mapped_column(default=datetime.now())
-    update_at: Mapped[Optional[datetime]] = mapped_column(default=datetime.now())
-    card_id: Mapped[int] = mapped_column(ForeignKey('cards.id'))
+    create_at: Mapped[Optional[datetime]] = mapped_column(
+        default=datetime.now()
+    )
+    update_at: Mapped[Optional[datetime]] = mapped_column(
+        default=datetime.now()
+    )
     card: Mapped['Card'] = relationship(back_populates='category')
 
 
