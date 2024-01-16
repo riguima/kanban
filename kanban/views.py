@@ -73,7 +73,7 @@ def init_app(app):
             user = session.scalars(query).first()
             cards = [
                 card
-                for card in session.scalars(select(Card))
+                for card in session.scalars(select(Card)).all()
                 if card.id in request.json['cards_ids']
             ]
             user.name = request.json['name']
