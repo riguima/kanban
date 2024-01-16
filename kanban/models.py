@@ -86,6 +86,9 @@ class CardCategory(Base):
     update_at: Mapped[Optional[datetime]] = mapped_column(
         default=datetime.now()
     )
+    card: Mapped['Card'] = relationship(
+        back_populates='category', cascade='all, delete-orphan'
+    )
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     user: Mapped['User'] = relationship(back_populates='cards_categories')
 
