@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <title>Kanban</title>
+{% endblock %}
+
+{% block content %}
+  <div class="cards">
+    <div class="card" id="todo">
+      {% for task in tasks %}
+        {% if task.status == 'todo' %}
+          <div class="task"><i class="fa-solid fa-arrow-left"></i>{{ task.title }} - {{ task.category_name }}<i class="fa-solid fa-arrow-right"></i></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="card" id="doing">
+      {% for task in tasks %}
+        {% if task.status == 'doing' %}
+          <div class="task"><i class="fa-solid fa-arrow-left"></i>{{ task.title }} - {{ task.category_name }}<i class="fa-solid fa-arrow-right"></i></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="card" id="done">
+      {% for task in tasks %}
+        {% if task.status == 'done' %}
+          <div class="task"><i class="fa-solid fa-arrow-left"></i>{{ task.title }} - {{ task.category_name }}<i class="fa-solid fa-arrow-right"></i></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="forms-container">
+    <form class="action-form" method="post" action="{{ url_for('create_task') }}">
+      {{ create_task_form.csrf_token }}
+      {{ create_task_form.title.label(class_="form-label") }} {{ create_task_form.title(class_="form-control") }}
+      {{ create_task_form.category.label(class_="form-label") }} {{ create_task_form.category(class_="form-control") }}
+      <input type="submit" class="btn btn-primary" value="Adicionar Tarefa">
+    </form>
+    <form class="action-form" method="post" action="{{ url_for('create_category') }}">
+      {{ create_category_form.csrf_token }}
+      {{ create_category_form.name.label(class_="form-label") }} {{ create_category_form.name(class_="form-control") }}
+      <input type="submit" class="btn btn-primary" value="Adicionar Categoria">
+    </form>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}

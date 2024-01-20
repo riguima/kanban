@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <title>Login</title>
+{% endblock %}
+
+{% block content %}
+  {% if error_message %}
+    <div class="text-center alert alert-danger" role="alert">{{ error_message }}</div>
+  {% endif %}
+  <form id="login-form" method="post">
+    {{ form.csrf_token }}
+    <div class="mb-3">
+      {{ form.email.label(class_="form-label") }}
+      {{ form.email(class_="form-control") }}
+    </div>
+    <div class="mb-3">
+      {{ form.password.label(class_="form-label") }}
+      {{ form.password(class_="form-control") }}
+    </div>
+    <p class="text-center"><a class="link-opacity-100" href="{{ url_for('register') }}">Não tenho uma conta</a></p>
+    <button type="submit" class="btn btn-primary">Entrar</button>
+  </form>
+{% endblock %}

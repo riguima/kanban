@@ -19,18 +19,34 @@ class User(Base):
     email: Mapped[str]
     token: Mapped[str]
     photo: Mapped[Optional[str]]
+    authenticated: Mapped[Optional[bool]] = mapped_column(default=False)
     create_at: Mapped[Optional[datetime]] = mapped_column(
         default=datetime.now()
     )
     update_at: Mapped[Optional[datetime]] = mapped_column(
         default=datetime.now()
     )
-    cards: Mapped[List['Card']] = relationship(
+    tasks: Mapped[List['Task']] = relationship(
         back_populates='user', cascade='all, delete-orphan'
     )
-    cards_categories: Mapped[List['CardCategory']] = relationship(
+    categories: Mapped[List['Category']] = relationship(
         back_populates='user', cascade='all, delete-orphan'
     )
+
+    @property
+    def is_authenticated(self):
+        return self.authenticated
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
 
     def to_dict(self):
         return {
@@ -42,12 +58,12 @@ class User(Base):
             'photo': self.photo,
             'create_at': self.create_at,
             'update_at': self.update_at,
-            'cards': [card.to_dict() for card in self.cards],
+            'tasks': [task.to_dict() for task in self.tasks],
         }
 
 
-class Card(Base):
-    __tablename__ = 'cards'
+class Task(Base):
+    __tablename__ = 'tasks'
     id: Mapped[int] = mapped_column(primary_key=True)
     status: Mapped[str]
     title: Mapped[str]
@@ -59,9 +75,9 @@ class Card(Base):
         default=datetime.now()
     )
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    user: Mapped['User'] = relationship(back_populates='cards')
-    category_id: Mapped[int] = mapped_column(ForeignKey('cards_categories.id'))
-    category: Mapped['CardCategory'] = relationship(back_populates='card')
+    user: Mapped['User'] = relationship(back_populates='tasks')
+    category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
+    category: Mapped['Category'] = relationship(back_populates='tasks')
 
     def to_dict(self):
         return {
@@ -71,13 +87,14 @@ class Card(Base):
             'description': self.description,
             'create_at': self.create_at,
             'update_at': self.update_at,
-            'user_id': self.user_id,
-            'category_id': self.category_id,
+            'user_id': self.user.id,
+            'category_id': self.category.id,
+            'category_name': self.category.name,
         }
 
 
-class CardCategory(Base):
-    __tablename__ = 'cards_categories'
+class Category(Base):
+    __tablename__ = 'categories'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     create_at: Mapped[Optional[datetime]] = mapped_column(
@@ -86,23 +103,20 @@ class CardCategory(Base):
     update_at: Mapped[Optional[datetime]] = mapped_column(
         default=datetime.now()
     )
-    card: Mapped['Card'] = relationship(
+    tasks: Mapped[List['Task']] = relationship(
         back_populates='category', cascade='all, delete-orphan'
     )
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    user: Mapped['User'] = relationship(back_populates='cards_categories')
+    user: Mapped['User'] = relationship(back_populates='categories')
 
     def to_dict(self):
-        if self.card:
-            card_id = self.card.id
-        else:
-            card_id = None
         return {
             'id': self.id,
             'name': self.name,
             'create_at': self.create_at,
             'update_at': self.update_at,
-            'card_id': card_id,
+            'user_id': self.user_id,
+            'tasks': [task.to_dict() for task in self.tasks],
         }
 
 

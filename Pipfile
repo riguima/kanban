@@ -9,6 +9,9 @@ toml = "*"
 sqlalchemy = "*"
 gunicorn = "*"
 freezegun = "*"
+flask-wtf = "*"
+httpx = "*"
+flask-login = "*"
 
 [dev-packages]
 pytest = "*"
