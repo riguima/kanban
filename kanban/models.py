@@ -56,8 +56,8 @@ class User(Base):
             'email': self.email,
             'token': self.token,
             'photo': self.photo,
-            'create_at': self.create_at,
-            'update_at': self.update_at,
+            'create_at': self.create_at.strftime('%d/%m/%Y %H:%M'),
+            'update_at': self.update_at.strftime('%d/%m/%Y %H:%M'),
             'tasks': [task.to_dict() for task in self.tasks],
         }
 
@@ -65,7 +65,7 @@ class User(Base):
 class Task(Base):
     __tablename__ = 'tasks'
     id: Mapped[int] = mapped_column(primary_key=True)
-    status: Mapped[str]
+    status: Mapped[Optional[str]] = mapped_column(default='todo')
     title: Mapped[str]
     description: Mapped[Optional[str]]
     create_at: Mapped[Optional[datetime]] = mapped_column(
@@ -76,8 +76,12 @@ class Task(Base):
     )
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     user: Mapped['User'] = relationship(back_populates='tasks')
-    category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
-    category: Mapped['Category'] = relationship(back_populates='tasks')
+    category_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey('categories.id')
+    )
+    category: Mapped[Optional['Category']] = relationship(
+        back_populates='tasks'
+    )
 
     def to_dict(self):
         return {
@@ -85,11 +89,13 @@ class Task(Base):
             'status': self.status,
             'title': self.title,
             'description': self.description,
-            'create_at': self.create_at,
-            'update_at': self.update_at,
+            'create_at': self.create_at.strftime('%d/%m/%Y %H:%M'),
+            'update_at': self.update_at.strftime('%d/%m/%Y %H:%M'),
             'user_id': self.user.id,
-            'category_id': self.category.id,
-            'category_name': self.category.name,
+            'category_id': None if self.category is None else self.category.id,
+            'category_name': ''
+            if self.category is None
+            else self.category.name,
         }
 
 
@@ -113,8 +119,8 @@ class Category(Base):
         return {
             'id': self.id,
             'name': self.name,
-            'create_at': self.create_at,
-            'update_at': self.update_at,
+            'create_at': self.create_at.strftime('%d/%m/%Y %H:%M'),
+            'update_at': self.update_at.strftime('%d/%m/%Y %H:%M'),
             'user_id': self.user_id,
             'tasks': [task.to_dict() for task in self.tasks],
         }

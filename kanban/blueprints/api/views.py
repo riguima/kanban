@@ -134,21 +134,22 @@ def get_task(task_id):
 
 @bp.post('/task')
 @token_required
-@required_fields('title', 'category_id')
+@required_fields('title')
 def create_task():
     with Session() as session:
         query = select(User).where(User.token == request.json['token'])
         user = session.scalars(query).first()
-        category = session.get(Category, request.json['category_id'])
-        if category is None:
-            return jsonify({'error': 'invalid category_id'}), 400
         task = Task(
-            status='todo',
             title=request.json['title'],
             description=request.json.get('description'),
-            category_id=category.id,
             user_id=user.id,
         )
+        print(request.json.get('category_id'))
+        if request.json.get('category_id'):
+            category = session.get(Category, request.json['category_id'])
+            if category is None:
+                return jsonify({'error': 'invalid category_id'}), 400
+            task.category = category
         session.add(task)
         session.commit()
         session.flush()

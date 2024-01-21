@@ -51,6 +51,7 @@
   padding: 1rem;
   gap: 1rem;
   text-align: center;
+  overflow-y: scroll;
 }
 
 .card__title {
@@ -79,6 +80,10 @@
   display: flex;
   width: 100%;
   justify-content: space-between;
+}
+
+.task__datetime {
+  color: rgb(var(--bs-primary-rgb));
 }
 
 .task__id {

@@ -1,10 +1,3 @@
-function recreateNode(element) {
-  element.querySelector('.fa-arrow-right').style.visibility = 'hidden';
-  element.querySelector('.fa-arrow-left').style.visibility = 'hidden';
-  element.parentNode.replaceChild(element.cloneNode(true), element);
-}
-
-
 function deleteTask(task){
   tasks.forEach((task_json) => {
     if (task_json.id == task.querySelector('.task__id').innerHTML){
@@ -42,7 +35,6 @@ const TASKS_STATUS = ['todo', 'doing', 'done'];
 
 
 function moveTaskToRight(task){
-  task.querySelector('.fa-trash').style.visibility = 'hidden';
   tasks.forEach((task_json) => {
     if (task_json.id == task.querySelector('.task__id').innerHTML){
       task_json.status = TASKS_STATUS[TASKS_STATUS.findIndex(status => status == task.parentElement.id) + 1];
@@ -54,7 +46,6 @@ function moveTaskToRight(task){
 
 
 function moveTaskToLeft(task){
-  task.querySelector('.fa-trash').style.visibility = 'hidden';
   tasks.forEach((task_json) => {
     if (task_json.id == task.querySelector('.task__id').innerHTML){
       task_json.status = TASKS_STATUS[TASKS_STATUS.findIndex(status => status == task.parentElement.id) - 1];
@@ -66,13 +57,15 @@ function moveTaskToLeft(task){
 
 
 function updateTask(task, task_json){
+  task.querySelector('.fa-trash').style.visibility = 'hidden';
+  task.querySelector('.fa-arrow-right').style.visibility = 'hidden';
+  task.querySelector('.fa-arrow-left').style.visibility = 'hidden';
   fetch(task_url, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(task_json),
   }).then((response) => {
     document.querySelector(`#${task_json.status}`).appendChild(task);
-    recreateNode(task);
     addEventListeners();
   });
 }
