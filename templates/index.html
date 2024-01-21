@@ -7,23 +7,50 @@
 {% block content %}
   <div class="cards">
     <div class="card" id="todo">
+      <h1 class="card__title">Para Fazer</h1>
       {% for task in tasks %}
         {% if task.status == 'todo' %}
-          <div class="task"><i class="fa-solid fa-arrow-left"></i>{{ task.title }} - {{ task.category_name }}<i class="fa-solid fa-arrow-right"></i></div>
+          <div class="task">
+            <span class="task__id">{{ task.id }}</span>
+            <i class="fa-solid fa-arrow-left"></i>
+            <span class="task__content">
+              <i class="fa-solid fa-trash"></i>
+              {{ task.title }} - {{ task.category_name }}
+              <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </div>
         {% endif %}
       {% endfor %}
     </div>
     <div class="card" id="doing">
+      <h1 class="card__title">Fazendo</h1>
       {% for task in tasks %}
         {% if task.status == 'doing' %}
-          <div class="task"><i class="fa-solid fa-arrow-left"></i>{{ task.title }} - {{ task.category_name }}<i class="fa-solid fa-arrow-right"></i></div>
+          <div class="task">
+            <span class="task__id">{{ task.id }}</span>
+            <i class="fa-solid fa-arrow-left"></i>
+            <span class="task__content">
+              <i class="fa-solid fa-trash"></i>
+              {{ task.title }} - {{ task.category_name }}
+              <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </div>
         {% endif %}
       {% endfor %}
     </div>
     <div class="card" id="done">
+      <h1 class="card__title">Feito</h1>
       {% for task in tasks %}
         {% if task.status == 'done' %}
-          <div class="task"><i class="fa-solid fa-arrow-left"></i>{{ task.title }} - {{ task.category_name }}<i class="fa-solid fa-arrow-right"></i></div>
+          <div class="task">
+            <span class="task__id">{{ task.id }}</span>
+            <i class="fa-solid fa-arrow-left"></i>
+            <span class="task__content">
+              <i class="fa-solid fa-trash"></i>
+              {{ task.title }} - {{ task.category_name }}
+              <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </div>
         {% endif %}
       {% endfor %}
     </div>
@@ -44,5 +71,10 @@
 {% endblock %}
 
 {% block scripts %}
+  <script>
+    var token = '{{ token }}';
+    var tasks = JSON.parse('{{ tasks_json|safe }}');
+    var task_url = '{{ update_task_url }}';
+  </script>
   <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}

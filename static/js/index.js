@@ -1,41 +1,92 @@
-var todo = document.querySelectorAll('#todo .task');
-var doing = document.querySelectorAll('#doing .task');
-var done = document.querySelectorAll('#done .task');
+function recreateNode(element) {
+  element.querySelector('.fa-arrow-right').style.visibility = 'hidden';
+  element.querySelector('.fa-arrow-left').style.visibility = 'hidden';
+  element.parentNode.replaceChild(element.cloneNode(true), element);
+}
 
 
-todo.forEach((task) => {
-  task.addEventListener('mouseover', (event) => {
-    task.querySelector('.fa-arrow-right').style.visibility = 'visible';
-  });
-  task.addEventListener('mouseout', (event) => {
-    task.querySelector('.fa-arrow-right').style.visibility = 'hidden';
-  });
-  task.querySelector('.fa-arrow-right').addEventListener('click', (event) => {
-  });
-});
+function deleteTask(task){
+  tasks.forEach((task_json) => {
+    if (task_json.id == task.querySelector('.task__id').innerHTML){
+      fetch(task_url, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: task_json.id, token}),
+      }).then((response) => {
+        task.remove();
+      });
+    }
+  })
+}
 
-doing.forEach((task) => {
-  task.addEventListener('mouseover', (event) => {
-    task.querySelector('.fa-arrow-right').style.visibility = 'visible';
+
+function onMouseOver(task){
+  if (task.parentElement.id !== 'todo'){
     task.querySelector('.fa-arrow-left').style.visibility = 'visible';
-  });
-  task.addEventListener('mouseout', (event) => {
-    task.querySelector('.fa-arrow-right').style.visibility = 'hidden';
-    task.querySelector('.fa-arrow-left').style.visibility = 'hidden';
-  });
-  task.querySelector('.fa-arrow-right').addEventListener('click', (event) => {
-  });
-  task.querySelector('.fa-arrow-left').addEventListener('click', (event) => {
-  });
-});
+  }
+  if (task.parentElement.id !== 'done'){
+    task.querySelector('.fa-arrow-right').style.visibility = 'visible';
+  }
+  task.querySelector('.fa-trash').style.visibility = 'visible';
+}
 
-done.forEach((task) => {
-  task.addEventListener('mouseover', (event) => {
-    task.querySelector('.fa-arrow-left').style.visibility = 'visible';
+
+function onMouseOut(task){
+  task.querySelector('.fa-arrow-left').style.visibility = 'hidden';
+  task.querySelector('.fa-arrow-right').style.visibility = 'hidden';
+  task.querySelector('.fa-trash').style.visibility = 'hidden';
+}
+
+
+const TASKS_STATUS = ['todo', 'doing', 'done'];
+
+
+function moveTaskToRight(task){
+  task.querySelector('.fa-trash').style.visibility = 'hidden';
+  tasks.forEach((task_json) => {
+    if (task_json.id == task.querySelector('.task__id').innerHTML){
+      task_json.status = TASKS_STATUS[TASKS_STATUS.findIndex(status => status == task.parentElement.id) + 1];
+      task_json.token = token;
+      updateTask(task, task_json);
+    }
   });
-  task.addEventListener('mouseout', (event) => {
-    task.querySelector('.fa-arrow-left').style.visibility = 'hidden';
+}
+
+
+function moveTaskToLeft(task){
+  task.querySelector('.fa-trash').style.visibility = 'hidden';
+  tasks.forEach((task_json) => {
+    if (task_json.id == task.querySelector('.task__id').innerHTML){
+      task_json.status = TASKS_STATUS[TASKS_STATUS.findIndex(status => status == task.parentElement.id) - 1];
+      task_json.token = token;
+      updateTask(task, task_json);
+    }
   });
-  task.querySelector('.fa-arrow-left').addEventListener('click', (event) => {
+}
+
+
+function updateTask(task, task_json){
+  fetch(task_url, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(task_json),
+  }).then((response) => {
+    document.querySelector(`#${task_json.status}`).appendChild(task);
+    recreateNode(task);
+    addEventListeners();
   });
-});
+}
+
+
+function addEventListeners(){
+  let all_tasks = document.querySelectorAll('.task');
+  all_tasks.forEach((task) => {
+    task.querySelector('.fa-trash').addEventListener('click', event => deleteTask(task));
+    task.addEventListener('mouseover', event => onMouseOver(task));
+    task.addEventListener('mouseout', event => onMouseOut(task));
+    task.querySelector('.fa-arrow-right').addEventListener('click', event => moveTaskToRight(task));
+    task.querySelector('.fa-arrow-left').addEventListener('click', event => moveTaskToLeft(task));
+  })
+}
+
+addEventListeners();

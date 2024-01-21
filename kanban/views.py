@@ -1,4 +1,5 @@
 from flask import redirect, render_template, request, url_for
+import json
 from httpx import Client
 
 from flask_login import login_user, login_required, logout_user, current_user
@@ -25,6 +26,9 @@ def init_app(app):
                 create_task_form=create_task_form,
                 create_category_form=create_category_form,
                 tasks=response.json(),
+                tasks_json=json.dumps(response.json()),
+                token=current_user.token,
+                update_task_url=request.url_root + url_for('api.update_task')[1:],
             )
 
     @app.route('/login', methods=['GET', 'POST'])

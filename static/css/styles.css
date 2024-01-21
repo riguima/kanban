@@ -50,6 +50,24 @@
   height: 100%;
   padding: 1rem;
   gap: 1rem;
+  text-align: center;
+}
+
+.card__title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#todo .card__title {
+  color: rgb(var(--bs-danger-rgb));
+}
+
+#doing .card__title {
+  color: rgb(var(--bs-warning-rgb));
+}
+
+#done .card__title {
+  color: rgb(var(--bs-success-rgb));
 }
 
 .task {
@@ -57,8 +75,27 @@
   justify-content: space-between;
 }
 
-.fa-arrow-left, .fa-arrow-right {
+.task__content {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.task__id {
+  display: none;
+}
+
+.fa-arrow-left, .fa-arrow-right, .fa-trash {
   visibility: hidden;
-  color: rgb(var(--bs-primary-rgb));
   font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.fa-arrow-left, .fa-arrow-right {
+  color: rgb(var(--bs-primary-rgb));
+  margin: 0px 2rem;
+}
+
+.fa-trash {
+  color: rgb(var(--bs-danger-rgb));
 }

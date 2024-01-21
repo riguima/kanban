@@ -101,10 +101,11 @@ def delete_user():
     with Session() as session:
         query = select(User).where(User.token == request.json['token'])
         user = session.scalars(query).first()
+        response = user.to_dict()
         session.delete(user)
         session.commit()
         session.flush()
-        return jsonify(user.to_dict())
+        return jsonify(response)
 
 
 @bp.get('/task')
@@ -188,10 +189,11 @@ def delete_task():
         task = session.get(Task, request.json['id'])
         if task is None:
             return jsonify({'error': 'task not found'}), 404
+        response = task.to_dict()
         session.delete(task)
         session.commit()
         session.flush()
-        return jsonify(task.to_dict())
+        return jsonify(response)
 
 
 @bp.get('/category')
@@ -258,7 +260,8 @@ def delete_category():
         category = session.get(Category, request.json['id'])
         if category is None:
             return jsonify({'error': 'category not found'}), 404
+        response = category.to_dict()
         session.delete(category)
         session.commit()
         session.flush()
-        return jsonify(category.to_dict())
+        return jsonify(response)
