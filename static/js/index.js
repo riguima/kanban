@@ -1,11 +1,13 @@
 function deleteTask(task){
   tasks.forEach((task_json) => {
     if (task_json.id == task.querySelector('.task__id').innerHTML){
-      fetch(task_url, {
+      fetch(task_url + '?' + new URLSearchParams({
+        id: task_json.id,
+        token,
+      }), {
         method: 'DELETE',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({id: task_json.id, token}),
       }).then((response) => {
+        console.log(response.json());
         task.remove();
       });
     }
