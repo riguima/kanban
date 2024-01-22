@@ -16,7 +16,9 @@ def required_fields(*fields):
         @wraps(function)
         def inner():
             for field in fields:
-                if request.json.get(field) is None:
+                try:
+                    request.json[field]
+                except KeyError:
                     return jsonify({'error': f'required field "{field}"'}), 400
             return function(*args, **kwargs)
 

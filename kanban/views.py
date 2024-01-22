@@ -31,7 +31,7 @@ def init_app(app):
                 tasks=response.json(),
                 tasks_json=json.dumps(response.json()),
                 token=current_user.token,
-                update_task_url=request.url_root
+                task_url=request.url_root
                 + url_for('api.update_task')[1:],
             )
 

@@ -13,24 +13,6 @@ function deleteTask(task){
 }
 
 
-function onMouseOver(task){
-  if (task.parentElement.id !== 'todo'){
-    task.querySelector('.fa-arrow-left').style.visibility = 'visible';
-  }
-  if (task.parentElement.id !== 'done'){
-    task.querySelector('.fa-arrow-right').style.visibility = 'visible';
-  }
-  task.querySelector('.fa-trash').style.visibility = 'visible';
-}
-
-
-function onMouseOut(task){
-  task.querySelector('.fa-arrow-left').style.visibility = 'hidden';
-  task.querySelector('.fa-arrow-right').style.visibility = 'hidden';
-  task.querySelector('.fa-trash').style.visibility = 'hidden';
-}
-
-
 const TASKS_STATUS = ['todo', 'doing', 'done'];
 
 
@@ -57,9 +39,6 @@ function moveTaskToLeft(task){
 
 
 function updateTask(task, task_json){
-  task.querySelector('.fa-trash').style.visibility = 'hidden';
-  task.querySelector('.fa-arrow-right').style.visibility = 'hidden';
-  task.querySelector('.fa-arrow-left').style.visibility = 'hidden';
   fetch(task_url, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
@@ -75,8 +54,6 @@ function addEventListeners(){
   let all_tasks = document.querySelectorAll('.task');
   all_tasks.forEach((task) => {
     task.querySelector('.fa-trash').addEventListener('click', event => deleteTask(task));
-    task.addEventListener('mouseover', event => onMouseOver(task));
-    task.addEventListener('mouseout', event => onMouseOut(task));
     task.querySelector('.fa-arrow-right').addEventListener('click', event => moveTaskToRight(task));
     task.querySelector('.fa-arrow-left').addEventListener('click', event => moveTaskToLeft(task));
   })

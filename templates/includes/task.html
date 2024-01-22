@@ -1,0 +1,15 @@
+<div class="task">
+  <span class="task__id">{{ task.id }}</span>
+  <i class="fa-solid fa-arrow-left"></i>
+  <span class="task__content">
+    <i class="fa-solid fa-trash"></i>
+    <span class="task__text">
+      {% if task.category_name %}
+        {{ task.title }} - {{ task.category_name }} <span class="task__datetime">{{ task.create_at }}</span>
+      {% else %}
+        {{ task.title }} <span class="task__datetime">{{ task.create_at }}</span>
+      {% endif %}
+    </span>
+  </span>
+  <i class="fa-solid fa-arrow-right"></i>
+</div>

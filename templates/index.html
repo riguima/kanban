@@ -5,80 +5,61 @@
 {% endblock %}
 
 {% block content %}
-  <div class="cards">
-    <div class="card" id="todo">
-      <h1 class="card__title">Para Fazer</h1>
-      {% for task in tasks %}
-        {% if task.status == 'todo' %}
-          <div class="task">
-            <span class="task__id">{{ task.id }}</span>
-            <i class="fa-solid fa-arrow-left"></i>
-            <span class="task__content">
-              <i class="fa-solid fa-trash"></i>
-              {% if task.category_name %}
-                {{ task.title }} - {{ task.category_name }} <span class="task__datetime">{{ task.create_at }}</span>
-              {% else %}
-                {{ task.title }} <span class="task__datetime">{{ task.create_at }}</span>
-              {% endif %}
-              <i class="fa-solid fa-arrow-right"></i>
-            </span>
-          </div>
-        {% endif %}
-      {% endfor %}
+  <main>
+    <h1 class="task-cards__title">Kanban</h1>
+    <div class="task-cards">
+      <div class="task-card" id="todo">
+        <h1 class="task-card__title">Para Fazer</h1>
+        {% for task in tasks %}
+          {% if task.status == 'todo' %}
+            {% include "includes/task.html" %}
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="task-card" id="doing">
+        <h1 class="task-card__title">Fazendo</h1>
+        {% for task in tasks %}
+          {% if task.status == 'doing' %}
+            {% include "includes/task.html" %}
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="task-card" id="done">
+        <h1 class="task-card__title">Feito</h1>
+        {% for task in tasks %}
+          {% if task.status == 'done' %}
+            {% include "includes/task.html" %}
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
-    <div class="card" id="doing">
-      <h1 class="card__title">Fazendo</h1>
-      {% for task in tasks %}
-        {% if task.status == 'doing' %}
-          <div class="task">
-            <span class="task__id">{{ task.id }}</span>
-            <i class="fa-solid fa-arrow-left"></i>
-            <span class="task__content">
-              <i class="fa-solid fa-trash"></i>
-              {{ task.title }} - {{ task.category_name }}
-              <i class="fa-solid fa-arrow-right"></i>
-            </span>
-          </div>
-        {% endif %}
-      {% endfor %}
+    <div class="forms-container">
+      <form class="action-form" method="post" action="{{ url_for('create_task') }}">
+        <div class="input-container">
+          {{ create_task_form.csrf_token }}
+          {{ create_task_form.title.label(class_="form-label") }} {{ create_task_form.title(class_="form-control") }}
+        </div>
+        <div class="input-container">
+          {{ create_task_form.category.label(class_="form-label") }} {{ create_task_form.category(class_="form-control") }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Adicionar Tarefa">
+      </form>
+      <form class="action-form" method="post" action="{{ url_for('create_category') }}">
+        <div class="input-container">
+          {{ create_category_form.csrf_token }}
+          {{ create_category_form.name.label(class_="form-label") }} {{ create_category_form.name(class_="form-control") }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Adicionar Categoria">
+      </form>
     </div>
-    <div class="card" id="done">
-      <h1 class="card__title">Feito</h1>
-      {% for task in tasks %}
-        {% if task.status == 'done' %}
-          <div class="task">
-            <span class="task__id">{{ task.id }}</span>
-            <i class="fa-solid fa-arrow-left"></i>
-            <span class="task__content">
-              <i class="fa-solid fa-trash"></i>
-              {{ task.title }} - {{ task.category_name }}
-              <i class="fa-solid fa-arrow-right"></i>
-            </span>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </div>
-  <div class="forms-container">
-    <form class="action-form" method="post" action="{{ url_for('create_task') }}">
-      {{ create_task_form.csrf_token }}
-      {{ create_task_form.title.label(class_="form-label") }} {{ create_task_form.title(class_="form-control") }}
-      {{ create_task_form.category.label(class_="form-label") }} {{ create_task_form.category(class_="form-control") }}
-      <input type="submit" class="btn btn-primary" value="Adicionar Tarefa">
-    </form>
-    <form class="action-form" method="post" action="{{ url_for('create_category') }}">
-      {{ create_category_form.csrf_token }}
-      {{ create_category_form.name.label(class_="form-label") }} {{ create_category_form.name(class_="form-control") }}
-      <input type="submit" class="btn btn-primary" value="Adicionar Categoria">
-    </form>
-  </div>
+  </main>
 {% endblock %}
 
 {% block scripts %}
   <script>
     var token = '{{ token }}';
     var tasks = JSON.parse('{{ tasks_json|safe }}');
-    var task_url = '{{ update_task_url }}';
+    var task_url = '{{ task_url }}';
   </script>
   <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
