@@ -1,7 +1,7 @@
-TESTING = false
-
-[default]
-DATABASE_URI = "sqlite:///database.db"
-
-[testing]
-DATABASE_URI = "sqlite:///database.db"
+DATABASE_URI = "YOUR_DATABASE_URI"
+SECRET_KEY = "YOUR_SECRET_KEY"
+EXTENSIONS = [
+  "kanban.extensions.login",
+  "kanban.blueprints.api",
+  "kanban.views",
+]
