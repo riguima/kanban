@@ -8,6 +8,9 @@ from wtforms.validators import DataRequired
 
 class CategoryField(SelectField):
     def __init__(self, *args, **kwargs):
+        with_nothing = kwargs.get('with_nothing')
+        if with_nothing:
+            del kwargs['with_nothing']
         super().__init__(*args, **kwargs)
         with Client() as client:
             response = client.get(
@@ -18,12 +21,13 @@ class CategoryField(SelectField):
                 (category['id'], category['name'])
                 for category in response.json()
             ]
-            self.choices.insert(0, (0, 'Nenhuma'))
+            if with_nothing:
+                self.choices.insert(0, (0, 'Nenhuma'))
 
 
 class CreateTaskForm(FlaskForm):
     title = StringField('Titulo', validators=[DataRequired()])
-    category = CategoryField('Categoria', validators=[DataRequired()])
+    category = CategoryField('Categoria', validators=[DataRequired()], with_nothing=True)
 
 
 class CreateCategoryForm(FlaskForm):
