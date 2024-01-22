@@ -51,6 +51,13 @@
         </div>
         <input type="submit" class="btn btn-primary" value="Adicionar Categoria">
       </form>
+      <form class="action-form" method="post" action="{{ url_for('delete_category') }}">
+        <div class="input-container">
+          {{ delete_category_form.csrf_token }}
+          {{ delete_category_form.category.label(class_="form-label") }} {{ delete_category_form.category(class_="form-control") }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Remover Categoria">
+      </form>
     </div>
   </main>
 {% endblock %}

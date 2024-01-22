@@ -17,7 +17,10 @@ def required_fields(*fields):
         def inner():
             for field in fields:
                 try:
-                    request.json[field]
+                    if request.method in ['GET', 'DELETE']:
+                        request.args[field]
+                    else:
+                        request.json[field]
                 except KeyError:
                     return jsonify({'error': f'required field "{field}"'}), 400
             return function(*args, **kwargs)
@@ -31,14 +34,14 @@ def token_required(function):
     @wraps(function)
     def decorator(*args, **kwargs):
         with Session() as session:
-            if request.method != 'GET':
-                if request.json.get('token') is None:
-                    return jsonify({'error': 'required field "token"'}), 400
-                query = select(User).where(User.token == request.json['token'])
-            else:
+            if request.method in ['GET', 'DELETE']:
                 if request.args.get('token') is None:
                     return jsonify({'error': 'required field "token"'}), 400
                 query = select(User).where(User.token == request.args['token'])
+            else:
+                if request.json.get('token') is None:
+                    return jsonify({'error': 'required field "token"'}), 400
+                query = select(User).where(User.token == request.json['token'])
             user = session.scalars(query).first()
             if user is None:
                 return jsonify({'error': 'invalid token'}), 400
@@ -101,7 +104,7 @@ def update_user():
 @token_required
 def delete_user():
     with Session() as session:
-        query = select(User).where(User.token == request.json['token'])
+        query = select(User).where(User.token == request.args['token'])
         user = session.scalars(query).first()
         response = user.to_dict()
         session.delete(user)
@@ -189,7 +192,7 @@ def update_task():
 @required_fields('id')
 def delete_task():
     with Session() as session:
-        task = session.get(Task, request.json['id'])
+        task = session.get(Task, request.args['id'])
         if task is None:
             return jsonify({'error': 'task not found'}), 404
         response = task.to_dict()
@@ -260,7 +263,7 @@ def update_category():
 @required_fields('id')
 def delete_category():
     with Session() as session:
-        category = session.get(Category, request.json['id'])
+        category = session.get(Category, request.args['id'])
         if category is None:
             return jsonify({'error': 'category not found'}), 404
         response = category.to_dict()

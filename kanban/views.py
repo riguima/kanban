@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from kanban.database import Session
 from kanban.forms import (CreateCategoryForm, CreateTaskForm, LoginForm,
-                          RegisterForm)
+                          RegisterForm, DeleteCategoryForm)
 from kanban.models import User
 
 
@@ -17,6 +17,7 @@ def init_app(app):
     def index():
         create_task_form = CreateTaskForm()
         create_category_form = CreateCategoryForm()
+        delete_category_form = DeleteCategoryForm()
         with Client() as client:
             response = client.get(
                 request.url_root + url_for('api.get_tasks')[1:],
@@ -28,6 +29,7 @@ def init_app(app):
                 'index.html',
                 create_task_form=create_task_form,
                 create_category_form=create_category_form,
+                delete_category_form=delete_category_form,
                 tasks=response.json(),
                 tasks_json=json.dumps(response.json()),
                 token=current_user.token,
@@ -114,6 +116,21 @@ def init_app(app):
                     request.url_root + url_for('api.create_category')[1:],
                     json={
                         'name': request.form['name'],
+                        'token': current_user.token,
+                    },
+                )
+        return redirect(url_for('index'))
+    
+    @app.post('/delete-category')
+    @login_required
+    def delete_category():
+        form = DeleteCategoryForm()
+        if form.validate_on_submit():
+            with Client() as client:
+                client.delete(
+                    request.url_root + url_for('api.delete_category')[1:],
+                    params={
+                        'id': int(request.form['category']),
                         'token': current_user.token,
                     },
                 )

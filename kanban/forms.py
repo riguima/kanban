@@ -30,6 +30,10 @@ class CreateCategoryForm(FlaskForm):
     name = StringField('Nome', validators=[DataRequired()])
 
 
+class DeleteCategoryForm(FlaskForm):
+    category = CategoryField('Categoria', validators=[DataRequired()])
+
+
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired()])
     password = PasswordField('Senha', validators=[DataRequired()])
